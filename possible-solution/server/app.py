@@ -61,7 +61,7 @@ def predict():
 @app.route('/airports', methods=['GET'])
 def airports():
     # Load airports from csv file
-        airports = open(os.path.join(BASE_DIR, 'airports.csv'), 'r').readlines()
+    airports = open(os.path.join(BASE_DIR, 'airports.csv'), 'r').readlines()
 
     # Remove first line of airports
     airports.pop(0)
