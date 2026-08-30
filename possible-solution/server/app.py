@@ -1,9 +1,11 @@
 # Create a base Flask server
 
 import pickle
+import os
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+BASE_DIR = os.path.dirname(__file__)
 
 # Enable cors
 @app.after_request
@@ -17,7 +19,7 @@ def after_request(response):
 
 
 # Load model from pickle file
-model = pickle.load(open('model.pkl', 'rb'))
+model = pickle.load(open(os.path.join(BASE_DIR, 'model.pkl'), 'rb'))
 
 # Model takes two parameters - day of week and airport id, then returns a prediction of flight delay
 @app.route('/predict', methods=['GET'])
@@ -59,7 +61,7 @@ def predict():
 @app.route('/airports', methods=['GET'])
 def airports():
     # Load airports from csv file
-    airports = open('airports.csv', 'r').readlines()
+        airports = open(os.path.join(BASE_DIR, 'airports.csv'), 'r').readlines()
 
     # Remove first line of airports
     airports.pop(0)
