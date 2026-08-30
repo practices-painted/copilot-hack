@@ -29,15 +29,28 @@ def predict():
     day_of_week = int(request.args.get('day_of_week'))
     airport_id = int(request.args.get('airport_id'))
     prediction = model.predict_proba([[day_of_week, airport_id]])[0]
-    
-    # Split prediction string by space
-    prediction = str(prediction).split(' ')
 
-    # store first value from prediction as certainty, and remove the first character
-    certainty = float(prediction[0][2:])
-
-    # store second value from prediction as delay, and remove the last character
-    delay = float(prediction[1][:-1])
+    # Normalize prediction to a string and handle multiple formats (bytes, strings, lists)
+    if isinstance(prediction, (list, tuple)):
+        # If it's a list/tuple of values, try to parse directly
+        try:
+            certainty = float(prediction[0])
+            delay = float(prediction[1])
+        except Exception:
+            pred_str = ' '.join(map(str, prediction))
+            pred_str = pred_str.strip().strip("'\"")
+            parts = pred_str.split()
+            certainty = float(parts[0])
+            delay = float(parts[1])
+    else:
+        if isinstance(prediction, (bytes, bytearray)):
+            pred_str = prediction.decode('utf-8', errors='ignore')
+        else:
+            pred_str = str(prediction)
+        pred_str = pred_str.strip().strip("'\"")
+        parts = pred_str.split()
+        certainty = float(parts[0])
+        delay = float(parts[1])
 
     # return prediction as json
     return jsonify({'certainty': certainty, 'delay': delay})
